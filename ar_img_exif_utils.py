@@ -10,21 +10,8 @@ import csv
 #converts GPS DMS coordinates to coordinates
 #in the New York - Long Island State Plane Projection Coordinates
 def convertGPStoNYLISPC (GPSLong,GPSLat):
-    Degs,Mins,Secs = (0,1,2)
-    Long = []
-    Lat=[]
-    #data Degs Mins and Secs are Ratios
-    #convert them to floats
-    Lat.append(float(GPSLat[Degs].num))
-    Lat.append(float(GPSLat[Mins].num))
-    Lat.append(float(GPSLat[Secs].num / GPSLat[Secs].den))
     
-    Long.append(float(GPSLong[Degs].num))
-    Long.append(float(GPSLong[Mins].num))
-    Long.append(float(GPSLong[Secs].num / GPSLong[Secs].den))
-    
-    degLat  = Lat[Degs] + (60*Lat[Mins] + Lat[Secs]) / (60*60)
-    degLong = Long[Degs] + (60*Long[Mins] + Long[Secs]) / (60*60)
+    degLong,degLat = convertGPStoDegLongLat(GPSLong,GPSLat)
     
     #convert to New York - Long Island State Plane Cordinates (ESRI:102718)
     projectstr = "+proj=lcc +lat_1=40.66666666666666 +lat_2=41.03333333333333 +lat_0=40.16666666666666 +lon_0=-74 +x_0=300000 +y_0=0 +ellps=GRS80 +datum=NAD83 +to_meter=0.3048006096012192 +no_defs"
