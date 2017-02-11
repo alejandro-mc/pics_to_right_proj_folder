@@ -33,6 +33,26 @@ def convertGPStoNYLISPC (GPSLong,GPSLat):
     xcoord,ycoord = p(-degLong,degLat)  
     return (xcoord,ycoord)
 
+#PRE: GPSLong, GPSLat: are strings of the form [degrees,minutes,seconds] with seconds expresed as a fraction
+def convertGPStoDegLongLat(GPSLong,GPSLat):
+    Degs,Mins,Secs = (0,1,2)
+    Long = []
+    Lat=[]
+    #data Degs Mins and Secs are Ratios
+    #convert them to floats
+    Lat.append(float(GPSLat[Degs].num))
+    Lat.append(float(GPSLat[Mins].num))
+    Lat.append(float(GPSLat[Secs].num / GPSLat[Secs].den))
+    
+    Long.append(float(GPSLong[Degs].num))
+    Long.append(float(GPSLong[Mins].num))
+    Long.append(float(GPSLong[Secs].num / GPSLong[Secs].den))
+    
+    degLat  = Lat[Degs] + (60*Lat[Mins] + Lat[Secs]) / (60*60)
+    degLong = Long[Degs] + (60*Long[Mins] + Long[Secs]) / (60*60)
+    
+    return degLong,degLat
+
 
 #create rtree index for project list
 #PRE: keys_coords is a list of ((Borough,Block,Lot),(xcoord,ycoord)) pairs
@@ -202,9 +222,8 @@ def readProjectKeys():
     
     return keys
 
-#PRE:  img-filename is the name of an image file
-#POST: prints the eix info for an image
-def printGpsExif(img_filename):
+
+def readGpsExif(img_filename):
     try:
         print("Trying to read EXIF from ",img_filename)
         with open(img_filename,'rb') as f:
@@ -212,6 +231,20 @@ def printGpsExif(img_filename):
     except:
         print("Could not read EXIF info")
         return -1
+    
+    return tags
+
+#PRE tags is a dictionary containing exif data, must have fields
+#         'GPS GPSLongitude' and 'GPS GPSLatitude'
+def getGpsLongLat(tags):
+    return tags['GPS GPSLongitude'].values, tags['GPS GPSLatitude'].values
+
+
+#PRE:  img-filename is the name of an image file
+#POST: prints the eix info for an image
+def printGpsExif(img_filename):
+    
+    tags = readGpsExif(img_filename)
     
     for gps_tag in filter(lambda s: "GPS" in s.upper(),tags.keys()):
         print(gps_tag,": ",tags[gps_tag])
